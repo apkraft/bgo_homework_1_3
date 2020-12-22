@@ -1,13 +1,24 @@
 package credit
 
-import (
-	"math"
-)
+import "math"
 
-func Calculate(monthInterestRate, periodAmount, creditAmount int64) {
+func Calculate(interestRate, creditPeriod, creditAmount int) (int, int, int) {
 
-	multiplier := monthInterestRate * (1 + monthInterestRate) periodAmount / ((1 + monthInterestRate) periodAmount - 1),
-	monthlyAnnuityPayment := multiplier * creditAmount
+	monthlyInterestRate := (float64(interestRate) / 100) / 12
+	periodsAmount := creditPeriod * 12
+	creditAmountInKopecks := creditAmount * 100
 
-	return monthPayment, creditOverpayment, totalPayment
+	annuityCoeffDividend := monthlyInterestRate * math.Pow((1+monthlyInterestRate), float64(periodsAmount))
+
+	annuityCoeffDivisor := math.Pow((1+monthlyInterestRate), float64(periodsAmount)) - 1
+
+	annuityCoeff := annuityCoeffDividend / annuityCoeffDivisor
+
+	monthlyAnnuityPaymentInKopecks := int(annuityCoeff * float64(creditAmountInKopecks))
+
+	totalPaymentInKopecks := monthlyAnnuityPaymentInKopecks * periodsAmount
+
+	creditOverpaymentInKopecks := totalPaymentInKopecks - creditAmountInKopecks
+
+	return monthlyAnnuityPaymentInKopecks, creditOverpaymentInKopecks, totalPaymentInKopecks
 }
